@@ -850,7 +850,7 @@ usage(const XML_Char *prog, int rc) {
        * $ xmlwf/xmlwf_helpgen.sh
        */
       /* clang-format off */
-      T("usage: %s [-s] [-n] [-p] [-x] [-e ENCODING] [-w] [-r] [-d DIRECTORY]\n")
+      T("usage: %s [-s] [-n] [-p] [-x] [-e ENCODING] [-w] [-r] [-k] [-d DIRECTORY]\n")
       T("             [-c | -m | -t] [-N]\n")
       T("             [FILE [FILE ...]]\n")
       T("\n")
@@ -867,6 +867,7 @@ usage(const XML_Char *prog, int rc) {
       T("  -e ENCODING   override any in-document [e]ncoding declaration\n")
       T("  -w            enable support for [W]indows code pages\n")
       T("  -r            disable memory-mapping and use normal file [r]ead IO calls instead\n")
+      T("  -k            when processing multiple files, [k]eep processing after first file with error\n")
       T("\n")
       T("output control arguments:\n")
       T("  -d DIRECTORY  output [d]estination directory\n")
@@ -902,6 +903,7 @@ tmain(int argc, XML_Char **argv) {
   int useNamespaces = 0;
   int requireStandalone = 0;
   int requiresNotations = 0;
+  int keepgoingafterbadfile = 0;
   enum XML_ParamEntityParsing paramEntityParsing
       = XML_PARAM_ENTITY_PARSING_NEVER;
   int useStdin = 0;
@@ -990,12 +992,17 @@ tmain(int argc, XML_Char **argv) {
     case T('v'):
       showVersion(argv[0]);
       return 0;
+    case T('k'):
+      keepgoingafterbadfile = 1;
+      j++;
+      break;
     case T('\0'):
       if (j > 1) {
         i++;
         j = 0;
         break;
       }
+
       /* fall through */
     default:
       usage(argv[0], 2);
@@ -1122,7 +1129,7 @@ tmain(int argc, XML_Char **argv) {
       free(outName);
     }
     XML_ParserFree(parser);
-    if (! result) {
+    if ((! result) && (! keepgoingafterbadfile)) {
       exit(2);
     }
   }
