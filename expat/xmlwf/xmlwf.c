@@ -848,6 +848,7 @@ usage(const XML_Char *prog, int rc) {
       stderr,
       /* Generated with:
        * $ xmlwf/xmlwf_helpgen.sh
+       * To update, change xmlwf/xmlwf_helpgen.py, then paste the output of xmlwf_helpgen.sh in here.
        */
       /* clang-format off */
       T("usage: %s [-s] [-n] [-p] [-x] [-e ENCODING] [-w] [-r] [-k] [-d DIRECTORY]\n")
@@ -880,6 +881,7 @@ usage(const XML_Char *prog, int rc) {
       T("  -h            show this [h]elp message and exit\n")
       T("  -v            show program's [v]ersion number and exit\n")
       T("\n")
+      T("xmlwf exits with status 0 if there are no errors, 2 if any input contains errors.\n")
       T("xmlwf of libexpat is software libre, licensed under the MIT license.\n")
       T("Please report bugs at https://github.com/libexpat/libexpat/issues.  Thank you!\n")
       , /* clang-format on */
@@ -903,7 +905,8 @@ tmain(int argc, XML_Char **argv) {
   int useNamespaces = 0;
   int requireStandalone = 0;
   int requiresNotations = 0;
-  int keepgoingafterbadfile = 0;
+  int continueOnError = 0;
+  int exitCode = 0;
   enum XML_ParamEntityParsing paramEntityParsing
       = XML_PARAM_ENTITY_PARSING_NEVER;
   int useStdin = 0;
@@ -993,7 +996,7 @@ tmain(int argc, XML_Char **argv) {
       showVersion(argv[0]);
       return 0;
     case T('k'):
-      keepgoingafterbadfile = 1;
+      continueOnError = 1;
       j++;
       break;
     case T('\0'):
@@ -1129,9 +1132,12 @@ tmain(int argc, XML_Char **argv) {
       free(outName);
     }
     XML_ParserFree(parser);
-    if ((! result) && (! keepgoingafterbadfile)) {
-      exit(2);
+    if (! result) {
+      exitCode = 2;
+      if (! continueOnError) {
+        break;
+      }
     }
   }
-  return 0;
+  return exitCode;
 }

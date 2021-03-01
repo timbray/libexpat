@@ -31,6 +31,7 @@
 import argparse
 
 epilog = """
+xmlwf exits with status 0 if there are no errors, 2 if any input contains errors.
 xmlwf of libexpat is software libre, licensed under the MIT license.
 Please report bugs at https://github.com/libexpat/libexpat/issues.  Thank you!
 """
@@ -48,6 +49,7 @@ input_related.add_argument('-x', action='store_true', help='enable processing of
 input_related.add_argument('-e', action='store', metavar='ENCODING', help='override any in-document [e]ncoding declaration')
 input_related.add_argument('-w', action='store_true', help='enable support for [W]indows code pages')
 input_related.add_argument('-r', action='store_true', help='disable memory-mapping and use normal file [r]ead IO calls instead')
+input_related.add_argument('-k', action='store_true', help='when processing multiple files, [k]eep processing after first file with error')
 
 output_related = parser.add_argument_group('output control arguments')
 output_related.add_argument('-d', action='store', metavar='DIRECTORY', help='output [d]estination directory')
