@@ -394,18 +394,16 @@ supports both.
   <refsect1>
   <title>OUTPUT</title>
     <para>
-	If any input file is not well-formed,
-	<command>&dhpackage;</command> prints a single line describing
-	the problem to standard output. If the <option>-k</option> option is
-	provided, <command>&dhpackage;</command> continues processing the
-	remaining input files, describing problems found in any of them.
-	If <option>-k</option> is not provided, <command>&dhpackage;</command>
-	exits after processing the first input file with a problem.
-	<option>-k</option> outputs nothing for files which are well-formed.
+	<command>&dhpackage;</command> outputs nothing for files which are problem-free.
+        If any input file is not well-formed, or if the output for any
+	input file cannot be opened, <command>&dhpackage;</command> prints a single
+	line describing	the problem to standard output.
     </para>
     <para>
-        <command>&dhpackage;</command> exits with code 0 if all its input
-        is well-formed and with code 2 if any input fails to be well-formed.
+        If the <option>-k</option> option is not provided, <command>&dhpackage;</command>
+	halts upon encountring a well-formedness or output-file error. 
+	If <option>-k</option> is provided, <command>&dhpackage;</command> continues
+	processing the remaining input files, describing problems found with any of them.
     </para>
   </refsect1>
 
