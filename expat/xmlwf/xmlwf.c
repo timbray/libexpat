@@ -882,10 +882,10 @@ usage(const XML_Char *prog, int rc) {
       T("  -v            show program's [v]ersion number and exit\n")
       T("\n")
       T("exit status:\n")
-      T("  0   everything succeeded, no problems encountered\n")
-      T("  1   could not allocate data structures, signals a serious problem with execution environment\n")
-      T("  2   command-line argument error, or one or more input files were not well-formed\n")
-      T("  3   could not create an output file\n")
+      T("  0             the input files are well-formed and the output (if requested) was written successfully\n")
+      T("  1             could not allocate data structures, signals a serious problem with execution environment\n")
+      T("  2             command-line argument error, or one or more input files were not well-formed\n")
+      T("  3             could not create an output file\n")
       T("\n")
       T("xmlwf of libexpat is software libre, licensed under the MIT license.\n")
       T("Please report bugs at https://github.com/libexpat/libexpat/issues.  Thank you!\n")
@@ -1075,55 +1075,58 @@ tmain(int argc, XML_Char **argv) {
       userData.fp = tfopen(outName, T("wb"));
       if (! userData.fp) {
         tperror(outName);
-	if (!continueOnError) {
-	  exit(3);
-	}
-      } else {
-	setvbuf(userData.fp, NULL, _IOFBF, 16384);
+        exitCode = 3;
+        if (continueOnError) {
+          free(outName);
+          continue;
+        } else {
+          break;
+        }
+      }
+      setvbuf(userData.fp, NULL, _IOFBF, 16384);
 #ifdef XML_UNICODE
-	puttc(0xFEFF, userData.fp);
+      puttc(0xFEFF, userData.fp);
 #endif
-	XML_SetUserData(parser, &userData);
-	switch (outputType) {
-	case 'm':
-	  XML_UseParserAsHandlerArg(parser);
-	  XML_SetElementHandler(parser, metaStartElement, metaEndElement);
-	  XML_SetProcessingInstructionHandler(parser, metaProcessingInstruction);
-	  XML_SetCommentHandler(parser, metaComment);
-	  XML_SetCdataSectionHandler(parser, metaStartCdataSection,
-				     metaEndCdataSection);
-	  XML_SetCharacterDataHandler(parser, metaCharacterData);
-	  XML_SetDoctypeDeclHandler(parser, metaStartDoctypeDecl,
-				    metaEndDoctypeDecl);
-	  XML_SetEntityDeclHandler(parser, metaEntityDecl);
-	  XML_SetNotationDeclHandler(parser, metaNotationDecl);
-	  XML_SetNamespaceDeclHandler(parser, metaStartNamespaceDecl,
-				      metaEndNamespaceDecl);
-	  metaStartDocument(parser);
-	  break;
-	case 'c':
-	  XML_UseParserAsHandlerArg(parser);
-	  XML_SetDefaultHandler(parser, markup);
-	  XML_SetElementHandler(parser, defaultStartElement, defaultEndElement);
-	  XML_SetCharacterDataHandler(parser, defaultCharacterData);
-	  XML_SetProcessingInstructionHandler(parser,
-					      defaultProcessingInstruction);
-	  break;
-	default:
-	  if (useNamespaces)
-	    XML_SetElementHandler(parser, startElementNS, endElementNS);
-	  else
-	    XML_SetElementHandler(parser, startElement, endElement);
-	  XML_SetCharacterDataHandler(parser, characterData);
+      XML_SetUserData(parser, &userData);
+      switch (outputType) {
+      case 'm':
+        XML_UseParserAsHandlerArg(parser);
+        XML_SetElementHandler(parser, metaStartElement, metaEndElement);
+        XML_SetProcessingInstructionHandler(parser, metaProcessingInstruction);
+        XML_SetCommentHandler(parser, metaComment);
+        XML_SetCdataSectionHandler(parser, metaStartCdataSection,
+                                   metaEndCdataSection);
+        XML_SetCharacterDataHandler(parser, metaCharacterData);
+        XML_SetDoctypeDeclHandler(parser, metaStartDoctypeDecl,
+                                  metaEndDoctypeDecl);
+        XML_SetEntityDeclHandler(parser, metaEntityDecl);
+        XML_SetNotationDeclHandler(parser, metaNotationDecl);
+        XML_SetNamespaceDeclHandler(parser, metaStartNamespaceDecl,
+                                    metaEndNamespaceDecl);
+        metaStartDocument(parser);
+        break;
+      case 'c':
+        XML_UseParserAsHandlerArg(parser);
+        XML_SetDefaultHandler(parser, markup);
+        XML_SetElementHandler(parser, defaultStartElement, defaultEndElement);
+        XML_SetCharacterDataHandler(parser, defaultCharacterData);
+        XML_SetProcessingInstructionHandler(parser,
+                                            defaultProcessingInstruction);
+        break;
+      default:
+        if (useNamespaces)
+          XML_SetElementHandler(parser, startElementNS, endElementNS);
+        else
+          XML_SetElementHandler(parser, startElement, endElement);
+        XML_SetCharacterDataHandler(parser, characterData);
 #ifndef W3C14N
-	  XML_SetProcessingInstructionHandler(parser, processingInstruction);
-	  if (requiresNotations) {
-	    XML_SetDoctypeDeclHandler(parser, startDoctypeDecl, endDoctypeDecl);
-	    XML_SetNotationDeclHandler(parser, notationDecl);
-	  }
+        XML_SetProcessingInstructionHandler(parser, processingInstruction);
+        if (requiresNotations) {
+          XML_SetDoctypeDeclHandler(parser, startDoctypeDecl, endDoctypeDecl);
+          XML_SetNotationDeclHandler(parser, notationDecl);
+        }
 #endif /* not W3C14N */
-	  break;
-	}
+        break;
       }
     }
     if (windowsCodePages)

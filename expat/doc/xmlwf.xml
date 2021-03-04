@@ -401,7 +401,7 @@ supports both.
     </para>
     <para>
         If the <option>-k</option> option is not provided, <command>&dhpackage;</command>
-	halts upon encountring a well-formedness or output-file error. 
+	halts upon encountering a well-formedness or output-file error. 
 	If <option>-k</option> is provided, <command>&dhpackage;</command> continues
 	processing the remaining input files, describing problems found with any of them.
     </para>
@@ -413,7 +413,7 @@ supports both.
     <variablelist>
       <varlistentry>
         <term><option>0</option></term>
-        <listitem><para>The input files are well-formed.</para>
+        <listitem><para>The input files are well-formed and the output (if requested) was written successfully.</para>
         </listitem>
       </varlistentry>
       <varlistentry>

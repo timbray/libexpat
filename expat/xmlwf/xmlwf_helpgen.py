@@ -32,10 +32,10 @@ import argparse
 
 epilog = """
 exit status:
-  0   everything succeeded, no problems encountered
-  1   could not allocate data structures, signals a serious problem with execution environment
-  2   command-line argument error, one or more input files were not well-formed
-  3   could not create an output file
+  0             the input files are well-formed and the output (if requested) was written successfully
+  1             could not allocate data structures, signals a serious problem with execution environment
+  2             command-line argument error, or one or more input files were not well-formed
+  3             could not create an output file
 
 xmlwf of libexpat is software libre, licensed under the MIT license.
 Please report bugs at https://github.com/libexpat/libexpat/issues.  Thank you!
