@@ -322,6 +322,14 @@ freeNotations(XmlwfUserData *data) {
   data->notationListHead = NULL;
 }
 
+static void
+cleanupUserData(XmlwfUserData *userData) {
+  if (userData->currentDoctypeName != NULL) {
+    free((void *) userData->currentDoctypeName);
+  }
+  freeNotations(userData);
+}
+
 static int
 xcscmp(const XML_Char *xs, const XML_Char *xt) {
   while (*xs != 0 && *xt != 0) {
@@ -848,7 +856,8 @@ usage(const XML_Char *prog, int rc) {
       stderr,
       /* Generated with:
        * $ xmlwf/xmlwf_helpgen.sh
-       * To update, change xmlwf/xmlwf_helpgen.py, then paste the output of xmlwf/xmlwf_helpgen.sh in here.
+       * To update, change xmlwf/xmlwf_helpgen.py, then paste the output of 
+       * xmlwf/xmlwf_helpgen.sh in here.
        */
       /* clang-format off */
       T("usage: %s [-s] [-n] [-p] [-x] [-e ENCODING] [-w] [-r] [-k] [-d DIRECTORY]\n")
@@ -1078,6 +1087,7 @@ tmain(int argc, XML_Char **argv) {
         exitCode = 3;
         if (continueOnError) {
           free(outName);
+          cleanupUserData(&userData);
           continue;
         } else {
           break;
@@ -1144,7 +1154,9 @@ tmain(int argc, XML_Char **argv) {
     XML_ParserFree(parser);
     if (! result) {
       exitCode = 2;
-      if (! continueOnError) {
+      if (continueOnError) {
+        cleanupUserData(&userData);
+      } else {
         break;
       }
     }
